@@ -60,7 +60,7 @@ public class Client
     {
         Client client = new Client();
         await client.RunTest("GET", url => client => new ValueTask(client.GetAsync($"{url}/hello")));
-        await client.RunTest("Post(json)", url => client =>
+        await client.RunTest("POST(json)", url => client =>
             new ValueTask(client.PostAsync($"{url}/echo", new StringContent(JsonSerializer.Serialize<EchoMsg>(new EchoMsg("Just a test."))))));
 
         // var client = new HttpClient();
