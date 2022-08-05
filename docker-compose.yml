@@ -1,0 +1,42 @@
+version: '3.4'
+
+services:
+  server:
+    image: ${DOCKER_REGISTRY-}server
+    build:
+      context: .
+      dockerfile: Server/Dockerfile
+    ports:
+      - "51001:50001"
+      - "3500:3500"
+
+  server-dapr:
+    image: "daprio/daprd:latest"
+    command: [ "./daprd", "-app-id", "server", "-app-port", "80" ]
+    depends_on:
+      - server
+    network_mode: "service:server"
+
+  client:
+    image: ${DOCKER_REGISTRY-}client
+    build:
+      context: .
+      dockerfile: Client/Dockerfile
+    environment:
+      # - BASE_URL=http://localhost
+      # - PORT=3500
+      # - SERVER_APP_ID=server
+      # - NUM_WORKERS=250
+      # - BLOCKS_PER_WORKER=10
+      # - REQUEST_PER_BLOCK=500
+      - RUN_TIMES=10
+    ports:
+      - "52001:50001"
+    # network_mode: "service:server"
+
+  client-dapr:
+    image: "daprio/daprd:latest"
+    command: [ "./daprd", "-app-id", "client" ]
+    depends_on:
+      - client
+    network_mode: "service:client"
